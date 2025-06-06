@@ -1,0 +1,52 @@
+package ru.practicum.shareit.exception;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.stream.Collectors;
+
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Error> handleValidationException(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        return ResponseEntity.badRequest().body(new Error("Ошибка валидации", errorMessage));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFound(NotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Error> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        String errorMessage = ex.getMostSpecificCause().getMessage();
+
+        if (errorMessage != null &&
+                (errorMessage.contains("unique constraint") ||
+                        errorMessage.contains("duplicate key") ||
+                        errorMessage.contains("23505") ||
+                        errorMessage.contains("1062"))) {
+
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(new Error("Дублирование данных", "Email уже существует"));
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new Error("Ошибка записи", ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Error> handleGenericException(Exception ex) {
+        Error error = new Error("Внутрення ошибка сервера", "Произошла непредвиденная ошибка");
+        return ResponseEntity.internalServerError().body(error);
+    }
+}
