@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserDtoUpdate;
+import ru.practicum.shareit.user.model.User;
 
 import java.net.URI;
 import java.util.List;
@@ -57,7 +60,7 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(
             @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id) {
-        log.debug("Получение пользователя ID: {}", id);
+        log.debug("Получение пользователя по ID: {}", id);
         User user = userService.getUserById(id);
         UserDto userDto = userMapper.toDto(user);
         log.info("Пользователь ID = " + userDto.getId() + " получен");

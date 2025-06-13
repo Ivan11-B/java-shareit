@@ -1,22 +1,16 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @Builder
-public class Item {
+public class ItemDtoUpdate {
     private Long id;
 
-    @NotBlank
     private String name;
 
-    @NotBlank
     private String description;
 
     private Boolean available;

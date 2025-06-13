@@ -1,16 +1,20 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.user.model;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
+/**
+ * TODO Sprint add-controllers.
+ */
 @Data
 @Builder
-public class UserDto {
-
-    @Positive(message = "ID должен быть положительный")
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class User {
     private Long id;
 
     @NotBlank

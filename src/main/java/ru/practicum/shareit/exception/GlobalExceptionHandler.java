@@ -44,9 +44,9 @@ public class GlobalExceptionHandler {
                 .body(new Error("Ошибка записи", ex.getMessage()));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Error> handleGenericException(Exception ex) {
-        Error error = new Error("Внутрення ошибка сервера", "Произошла непредвиденная ошибка");
-        return ResponseEntity.internalServerError().body(error);
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<Error> handleGenericException(Exception ex) {
+//        Error error = new Error("Внутрення ошибка сервера", "Произошла непредвиденная ошибка");
+//        return ResponseEntity.internalServerError().body(error);
+//    }
 }
