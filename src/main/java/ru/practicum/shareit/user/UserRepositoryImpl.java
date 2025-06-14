@@ -53,7 +53,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void delete(Long id) {
-        emails.remove(users.get(id));
+        emails.remove(users.get(id).getEmail());
         users.remove(id);
     }
 
