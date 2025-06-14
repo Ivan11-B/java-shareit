@@ -113,6 +113,30 @@
 						</dependency>
 					</dependencies>
 				</plugin>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>3.4.1</version>
+					<executions>
+						<execution>
+							<id>enforce</id>
+							<configuration>
+								<rules>
+									<!-- Удалите или закомментируйте это правило -->
+									<!-- <RequireProfileIdsExist>
+                                        <profiles>check</profiles>
+                                    </RequireProfileIdsExist> -->
+								</rules>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+
+
+
+
+
 				<plugin>
 					<groupId>com.github.spotbugs</groupId>
 					<artifactId>spotbugs-maven-plugin</artifactId>
@@ -213,6 +237,16 @@
 						<groupId>com.github.spotbugs</groupId>
 						<artifactId>spotbugs-maven-plugin</artifactId>
 					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-checkstyle-plugin</artifactId>
+						<configuration>
+							<configLocation>checkstyle.xml</configLocation>
+							<failOnViolation>true</failOnViolation>
+							<logViolationsToConsole>true</logViolationsToConsole>
+						</configuration>
+					</plugin>
+
 				</plugins>
 			</build>
 			<reporting>
@@ -220,6 +254,10 @@
 					<plugin>
 						<groupId>com.github.spotbugs</groupId>
 						<artifactId>spotbugs-maven-plugin</artifactId>
+						<configuration>
+							<effort>Max</effort>
+							<threshold>High</threshold>
+						</configuration>
 					</plugin>
 				</plugins>
 			</reporting>
