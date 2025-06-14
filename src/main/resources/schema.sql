@@ -1,7 +1,0 @@
-DROP TABLE IF EXISTS users;
-
-CREATE TABLE users(
-    user_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    name varchar(100) NOT NULL,
-    email varchar(255) UNIQUE NOT NULL
-);

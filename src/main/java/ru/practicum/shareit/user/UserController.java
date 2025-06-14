@@ -48,10 +48,10 @@ public class UserController {
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDtoUpdate userDtoUpdate,
                                               @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id) {
-        log.debug("Обновление пользователя: {}", userDtoUpdate);
         userDtoUpdate.setId(id);
         User user = userMapper.toEntityUpdate(userDtoUpdate);
         user.setId(id);
+        log.debug("Обновление пользователя: {}", user);
         UserDto updatedUser = userMapper.toDto(userService.update(user));
         log.info("Пользователь ID = " + updatedUser.getId() + " обновлен");
         return ResponseEntity.ok(updatedUser);

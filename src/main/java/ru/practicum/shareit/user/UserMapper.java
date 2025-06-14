@@ -25,6 +25,7 @@ public class UserMapper {
 
     public User toEntityUpdate(UserDtoUpdate userDtoUpdate) {
         return User.builder()
+                .id(userDtoUpdate.getId())
                 .name(userDtoUpdate.getName())
                 .email(userDtoUpdate.getEmail())
                 .build();

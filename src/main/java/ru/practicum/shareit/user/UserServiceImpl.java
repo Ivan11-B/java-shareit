@@ -1,8 +1,8 @@
 package ru.practicum.shareit.user;
 
 import lombok.AllArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.DuplicateException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.model.User;
 
@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     public User create(User user) {
         try {
             return userRepository.save(user);
-        } catch (DataIntegrityViolationException ex) {
+        } catch (DuplicateException ex) {
             throw ex;
         }
     }
@@ -32,13 +32,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
         User currentUser = getUserById(user.getId());
+        User updateUser = new User(currentUser.getId(), currentUser.getName(), currentUser.getEmail());
         if (user.getName() != null) {
-            currentUser.setName(user.getName());
+            updateUser.setName(user.getName());
         }
         if (user.getEmail() != null) {
-            currentUser.setEmail(user.getEmail());
+            updateUser.setEmail(user.getEmail());
         }
-        return userRepository.update(currentUser);
+        return userRepository.update(updateUser);
     }
 
     @Override

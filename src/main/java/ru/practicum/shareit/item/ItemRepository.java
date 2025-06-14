@@ -15,5 +15,7 @@ public interface ItemRepository {
 
     Optional<Item> getItemById(Long id);
 
+    List<Item> getItemsToSearch(String text);
+
     void deleteItem(Long id);
 }

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
@@ -8,42 +7,60 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class ItemRepositoryImpl implements ItemRepository {
-    private Integer id = 1;
-    private final Map<Integer, Item> items = new HashMap<>();
+    private Long id = 1L;
+    private final Map<Long, Item> items = new HashMap<>();
 
     @Override
     public Item addItem(Item item) {
-        Integer itemId = nextId();
-        item.setId(Long.valueOf(itemId));
-        item.setAvailable(false);
+        Long itemId = nextId();
+        item.setId(itemId);
         items.put(itemId, item);
         return item;
     }
 
     @Override
     public Item updateItem(Item item) {
-        return null;
+        items.put(item.getId(), item);
+        return item;
     }
 
     @Override
     public List<Item> getAll() {
-        return null;
+        return items.values().stream().collect(Collectors.toList());
     }
 
     @Override
     public Optional<Item> getItemById(Long id) {
-        return Optional.empty();
+        Item currentItem = items.get(id);
+        if (currentItem == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(currentItem);
+        }
+    }
+
+    @Override
+    public List<Item> getItemsToSearch(String text) {
+        String searchText = text.toLowerCase();
+        List<Item> itemsToSearch = items.values().stream()
+                .filter(item -> item.getAvailable().equals(true))
+                .filter(item -> item.getName().toLowerCase().contains(searchText) ||
+                        item.getDescription().toLowerCase().contains(searchText))
+                .distinct()
+                .collect(Collectors.toList());
+        return itemsToSearch;
     }
 
     @Override
     public void deleteItem(Long id) {
-
+        items.remove(id);
     }
 
-    private Integer nextId() {
+    private Long nextId() {
         return id++;
     }
 }

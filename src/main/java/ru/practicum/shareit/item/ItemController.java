@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    public ResponseEntity<ItemDto> createItem(@RequestBody ItemDto itemDto,
+    public ResponseEntity<ItemDto> createItem(@Valid @RequestBody ItemDto itemDto,
                                               @RequestHeader("X-Sharer-User-Id") Long userId) {
         log.debug("Создание вещи: {}", itemDto);
         Item item = itemMapper.toEntity(itemDto);
@@ -34,23 +35,25 @@ public class ItemController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ItemDto> updateItem(@RequestBody ItemDtoUpdate itemDtoUpdate,
-                                              @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id) {
-        log.debug("Обновление пользователя: {}", itemDtoUpdate);
+    public ResponseEntity<ItemDto> updateItem(@Valid @RequestBody ItemDtoUpdate itemDtoUpdate,
+                                              @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id,
+                                              @RequestHeader("X-Sharer-User-Id") Long userId) {
         itemDtoUpdate.setId(id);
         Item item = itemMapper.toEntityUpdate(itemDtoUpdate);
-        ItemDto updatedItem = itemMapper.toDto(itemService.updateItem(item));
+        log.debug("Обновление вещи: {}", item);
+        ItemDto updatedItem = itemMapper.toDto(itemService.updateItem(item, userId));
         log.info("Вещь ID = " + updatedItem.getId() + " обновлена");
         return ResponseEntity.ok(updatedItem);
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> findAll() {
-        log.debug("Получение списка вещей");
+    public ResponseEntity<List<ItemDto>> findAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
+        log.debug("Получение списка вещей пользователя ID= {}", userId);
         List<ItemDto> items = itemService.findAll().stream()
+                .filter(item -> item.getUser().getId().equals(userId))
                 .map(itemMapper::toDto)
                 .collect(Collectors.toList());
-        log.info("Список вещей получен");
+        log.info("Список вещей ID= {} получен", userId);
         return ResponseEntity.ok(items);
     }
 
@@ -61,5 +64,15 @@ public class ItemController {
         ItemDto itemDto = itemMapper.toDto(item);
         log.info("Вещь ID = " + itemDto.getId() + " получен");
         return ResponseEntity.ok(itemDto);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ItemDto>> searchByString(@RequestParam String text) {
+        log.debug("Получение вещи по ключевому слову: {}", text);
+        List<ItemDto> items = itemService.searchByString(text).stream()
+                .map(itemMapper::toDto)
+                .collect(Collectors.toList());
+        log.info("Список вещей по ключевому слову: {} получен", text);
+        return ResponseEntity.ok(items);
     }
 }

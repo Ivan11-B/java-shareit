@@ -1,78 +1,72 @@
 package ru.practicum.shareit.user;
 
-import lombok.AllArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.InternalServerException;
+import ru.practicum.shareit.exception.DuplicateException;
 import ru.practicum.shareit.user.model.User;
 
-import java.sql.PreparedStatement;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
-@AllArgsConstructor
+
 public class UserRepositoryImpl implements UserRepository {
-
-    private final JdbcTemplate jdbcTemplate;
-    private final UserRowMapper userRowMapper;
-
-    private static final String FIND_ALL = "SELECT * FROM users";
-    private static final String CREATE_USER = """
-
-            INSERT INTO users(name, email) VALUES (?, ?)""";
-    private static final String UPDATE_USER = """
-
-            UPDATE users SET name = ?, email = ? WHERE user_id = ?""";
-    private static final String FIND_ONE_USER = """
-
-            SELECT * FROM users WHERE user_id = ?""";
-    private static final String DELETE = """
-
-            DELETE FROM users WHERE user_id = ?""";
+    private Long id = 1L;
+    private final Map<Long, User> users = new HashMap<>();
+    private final Set<String> emails = new HashSet<>();
 
     @Override
     public List<User> getAll() {
-        return jdbcTemplate.query(FIND_ALL, userRowMapper);
+        return users.values().stream().collect(Collectors.toList());
     }
 
     @Override
     public User save(User user) {
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(CREATE_USER, PreparedStatement.RETURN_GENERATED_KEYS);
-            ps.setString(1, user.getName());
-            ps.setString(2, user.getEmail());
-            return ps;
-        }, keyHolder);
-        Long generatedId = keyHolder.getKeyAs(Long.class);
-        if (generatedId == null) {
-            throw new InternalServerException("Не удалось сохранить пользователя");
-        }
-        user.setId(generatedId);
+        checkEmail(user.getEmail());
+        Long idUser = nextId();
+        user.setId(idUser);
+        users.put(idUser, user);
         return user;
     }
 
     @Override
     public User update(User user) {
-        jdbcTemplate.update(UPDATE_USER, user.getName(), user.getEmail(), user.getId());
+        User userToMap = users.get(user.getId());
+        if (user.getEmail().equals(userToMap.getEmail())) {
+            users.put(user.getId(), user);
+        } else {
+            checkEmail(user.getEmail());
+            emails.remove(userToMap.getEmail());
+            users.put(user.getId(), user);
+        }
         return user;
     }
 
     @Override
     public Optional<User> getUserById(Long id) {
-        try {
-            User user = jdbcTemplate.queryForObject(FIND_ONE_USER, userRowMapper, id);
-            return Optional.ofNullable(user);
-        } catch (EmptyResultDataAccessException ex) {
+        User currentUser = users.get(id);
+        if (currentUser == null) {
             return Optional.empty();
+        } else {
+            return Optional.of(currentUser);
         }
     }
 
     @Override
     public void delete(Long id) {
-        jdbcTemplate.update(DELETE, id);
+        emails.remove(users.get(id));
+        users.remove(id);
+    }
+
+    private Long nextId() {
+        return id++;
+    }
+
+    private boolean checkEmail(String email) {
+        if (emails.contains(email)) {
+            throw new DuplicateException(email + " уже существует!");
+        } else {
+            emails.add(email);
+            return true;
+        }
     }
 }
