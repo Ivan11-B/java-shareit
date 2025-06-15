@@ -39,7 +39,7 @@ public class ItemController {
                                               @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id,
                                               @RequestHeader("X-Sharer-User-Id") Long userId) {
         itemDtoUpdate.setId(id);
-        Item item = itemMapper.toEntityUpdate(itemDtoUpdate);
+        Item item = itemMapper.toEntity(itemDtoUpdate);
         log.debug("Обновление вещи: {}", item);
         ItemDto updatedItem = itemMapper.toDto(itemService.updateItem(item, userId));
         log.info("Вещь ID = " + updatedItem.getId() + " обновлена");
@@ -49,9 +49,8 @@ public class ItemController {
     @GetMapping
     public ResponseEntity<List<ItemDto>> findAll(@RequestHeader("X-Sharer-User-Id") Long userId) {
         log.debug("Получение списка вещей пользователя ID= {}", userId);
-        List<ItemDto> items = itemService.findAll().stream()
+        List<ItemDto> items = itemMapper.toDto(itemService.findAll()).stream()
                 .filter(item -> item.getUser().getId().equals(userId))
-                .map(itemMapper::toDto)
                 .collect(Collectors.toList());
         log.info("Список вещей ID= {} получен", userId);
         return ResponseEntity.ok(items);
@@ -69,9 +68,7 @@ public class ItemController {
     @GetMapping("/search")
     public ResponseEntity<List<ItemDto>> searchByString(@RequestParam String text) {
         log.debug("Получение вещи по ключевому слову: {}", text);
-        List<ItemDto> items = itemService.searchByString(text).stream()
-                .map(itemMapper::toDto)
-                .collect(Collectors.toList());
+        List<ItemDto> items = itemMapper.toDto(itemService.searchByString(text));
         log.info("Список вещей по ключевому слову: {} получен", text);
         return ResponseEntity.ok(items);
     }

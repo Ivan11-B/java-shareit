@@ -43,12 +43,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> getUserById(Long id) {
-        User currentUser = users.get(id);
-        if (currentUser == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(currentUser);
-        }
+        return Optional.ofNullable(users.get(id));
     }
 
     @Override

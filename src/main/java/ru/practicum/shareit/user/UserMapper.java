@@ -5,6 +5,9 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoUpdate;
 import ru.practicum.shareit.user.model.User;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class UserMapper {
 
@@ -16,6 +19,12 @@ public class UserMapper {
                 .build();
     }
 
+    public List<UserDto> toDto(List<User> users) {
+        return users.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
     public User toEntity(UserDto userDto) {
         return User.builder()
                 .name(userDto.getName())
@@ -23,7 +32,7 @@ public class UserMapper {
                 .build();
     }
 
-    public User toEntityUpdate(UserDtoUpdate userDtoUpdate) {
+    public User toEntity(UserDtoUpdate userDtoUpdate) {
         return User.builder()
                 .id(userDtoUpdate.getId())
                 .name(userDtoUpdate.getName())

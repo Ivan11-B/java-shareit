@@ -5,6 +5,9 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoUpdate;
 import ru.practicum.shareit.item.model.Item;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class ItemMapper {
 
@@ -18,16 +21,21 @@ public class ItemMapper {
                 .build();
     }
 
+    public List<ItemDto> toDto(List<Item> items) {
+        return items.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
     public Item toEntity(ItemDto itemDto) {
         return Item.builder()
-                .id(itemDto.getId())
                 .name(itemDto.getName())
                 .description(itemDto.getDescription())
                 .available(itemDto.getAvailable())
                 .build();
     }
 
-    public Item toEntityUpdate(ItemDtoUpdate itemDtoUpdate) {
+    public Item toEntity(ItemDtoUpdate itemDtoUpdate) {
         return Item.builder()
                 .id(itemDtoUpdate.getId())
                 .name(itemDtoUpdate.getName())

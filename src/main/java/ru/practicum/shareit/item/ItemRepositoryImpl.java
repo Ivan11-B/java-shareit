@@ -35,12 +35,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Optional<Item> getItemById(Long id) {
-        Item currentItem = items.get(id);
-        if (currentItem == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(currentItem);
-        }
+        return Optional.ofNullable(items.get(id));
     }
 
     @Override

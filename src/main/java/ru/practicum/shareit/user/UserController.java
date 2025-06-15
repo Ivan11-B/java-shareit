@@ -12,7 +12,6 @@ import ru.practicum.shareit.user.model.User;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * TODO Sprint add-controllers.
@@ -29,9 +28,7 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserDto>> findAll() {
         log.debug("Получение списка пользователей");
-        List<UserDto> users = userService.getAll().stream()
-                .map(userMapper::toDto)
-                .collect(Collectors.toList());
+        List<UserDto> users = userMapper.toDto(userService.getAll());
         log.info("Список пользователей получен");
         return ResponseEntity.ok(users);
     }
@@ -49,7 +46,7 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(@Valid @RequestBody UserDtoUpdate userDtoUpdate,
                                               @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id) {
         userDtoUpdate.setId(id);
-        User user = userMapper.toEntityUpdate(userDtoUpdate);
+        User user = userMapper.toEntity(userDtoUpdate);
         user.setId(id);
         log.debug("Обновление пользователя: {}", user);
         UserDto updatedUser = userMapper.toDto(userService.update(user));

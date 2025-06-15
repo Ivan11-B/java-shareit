@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Error> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorDto> handleValidationException(MethodArgumentNotValidException ex) {
         String errorMessage = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining("; "));
-        return ResponseEntity.badRequest().body(new Error("Ошибка валидации", errorMessage));
+        return ResponseEntity.badRequest().body(new ErrorDto("Ошибка валидации", errorMessage));
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -27,7 +27,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DuplicateException.class)
-    public ResponseEntity<Error> handleDuplicateEmail(DuplicateException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new Error("Дубликат", "Email уже занят"));
+    public ResponseEntity<ErrorDto> handleDuplicateEmail(DuplicateException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDto("Дубликат", "Email уже занят"));
     }
 }
