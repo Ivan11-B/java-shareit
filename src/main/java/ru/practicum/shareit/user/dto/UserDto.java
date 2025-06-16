@@ -1,18 +1,15 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.user.model.User;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @Builder
-public class ItemDto {
+public class UserDto {
+
     @Positive(message = "ID должен быть положительный")
     private Long id;
 
@@ -20,10 +17,6 @@ public class ItemDto {
     private String name;
 
     @NotBlank
-    private String description;
-
-    @NotNull
-    private Boolean available;
-
-    private User user;
+    @Email(message = "Некорректный email")
+    private String email;
 }

@@ -1,12 +1,11 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.user.model;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import ru.practicum.shareit.user.model.User;
 
 /**
  * TODO Sprint add-controllers.
@@ -15,17 +14,13 @@ import ru.practicum.shareit.user.model.User;
 @Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class Item {
+public class User {
     private Long id;
 
     @NotBlank
     private String name;
 
     @NotBlank
-    private String description;
-
-    @NotNull
-    private Boolean available;
-
-    private User user;
+    @Email(message = "Некорректный email")
+    private String email;
 }
