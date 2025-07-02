@@ -15,5 +15,5 @@ public class ItemDtoUpdate {
 
     private Boolean available;
 
-    private User user;
+    private User owner;
 }

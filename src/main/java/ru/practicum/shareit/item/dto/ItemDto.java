@@ -7,9 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @Builder
 public class ItemDto {
@@ -25,5 +22,5 @@ public class ItemDto {
     @NotNull
     private Boolean available;
 
-    private User user;
+    private User owner;
 }
