@@ -67,20 +67,14 @@ public class BookingServiceImpl implements BookingService {
             return bookingRepository.findByBookerIdOrderByStartDesc(userId);
         }
         State status = State.valueOf(state);
-        switch (status) {
-            case CURRENT:
-                return bookingRepository.findCurrentBookingsByBookerId(userId, LocalDateTime.now());
-            case PAST:
-                return bookingRepository.findPastBookingsByBookerId(userId, LocalDateTime.now());
-            case FUTURE:
-                return bookingRepository.findFutureBookingsByBookerId(userId, LocalDateTime.now());
-            case WAITING:
-                return bookingRepository.findByBookerIdAndStatus(userId, Status.WAITING);
-            case REJECTED:
-                return bookingRepository.findByBookerIdAndStatus(userId, Status.REJECTED);
-            default:
-                return bookingRepository.findByBookerIdOrderByStartDesc(userId);
-        }
+        return switch (status) {
+            case CURRENT -> bookingRepository.findCurrentBookingsByBookerId(userId, LocalDateTime.now());
+            case PAST -> bookingRepository.findPastBookingsByBookerId(userId, LocalDateTime.now());
+            case FUTURE -> bookingRepository.findFutureBookingsByBookerId(userId, LocalDateTime.now());
+            case WAITING -> bookingRepository.findByBookerIdAndStatus(userId, Status.WAITING);
+            case REJECTED -> bookingRepository.findByBookerIdAndStatus(userId, Status.REJECTED);
+            default -> bookingRepository.findByBookerIdOrderByStartDesc(userId);
+        };
     }
 
     @Override
@@ -90,20 +84,14 @@ public class BookingServiceImpl implements BookingService {
             return bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
         }
         State status = State.valueOf(state);
-        switch (status) {
-            case CURRENT:
-                return bookingRepository.findCurrentBookingsAllItemsByBookerId(userId, LocalDateTime.now());
-            case PAST:
-                return bookingRepository.findPastBookingsAllItemsByBookerId(userId, LocalDateTime.now());
-            case FUTURE:
-                return bookingRepository.findFutureBookingsAllItemsByBookerId(userId, LocalDateTime.now());
-            case WAITING:
-                return bookingRepository.findByItemOwnerIdAndStatus(userId, Status.WAITING);
-            case REJECTED:
-                return bookingRepository.findByItemOwnerIdAndStatus(userId, Status.REJECTED);
-            default:
-                return bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
-        }
+        return switch (status) {
+            case CURRENT -> bookingRepository.findCurrentBookingsAllItemsByBookerId(userId, LocalDateTime.now());
+            case PAST -> bookingRepository.findPastBookingsAllItemsByBookerId(userId, LocalDateTime.now());
+            case FUTURE -> bookingRepository.findFutureBookingsAllItemsByBookerId(userId, LocalDateTime.now());
+            case WAITING -> bookingRepository.findByItemOwnerIdAndStatus(userId, Status.WAITING);
+            case REJECTED -> bookingRepository.findByItemOwnerIdAndStatus(userId, Status.REJECTED);
+            default -> bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
+        };
     }
 
     private User validateUserById(Long id) {
