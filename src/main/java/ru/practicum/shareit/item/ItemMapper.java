@@ -1,7 +1,5 @@
 package ru.practicum.shareit.item;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -17,7 +15,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-@NoArgsConstructor
 public class ItemMapper {
 
     public ItemDto toDto(Item item) {

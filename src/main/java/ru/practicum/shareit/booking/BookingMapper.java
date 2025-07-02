@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking;
 
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@NoArgsConstructor
 public class BookingMapper {
 
     public BookingDto toDto(Booking booking) {

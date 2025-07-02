@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user;
 
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserDtoUpdate;
@@ -10,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-@NoArgsConstructor
 public class UserMapper {
 
     public UserDto toDto(User user) {
