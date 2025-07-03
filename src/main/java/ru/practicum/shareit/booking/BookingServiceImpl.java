@@ -6,9 +6,9 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.IllegalStateException;
 import ru.practicum.shareit.exception.ItemOwnershipException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -16,11 +16,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
-    private final ItemRepository itemRepository;
-    private final UserRepository userRepository;
+    private final ItemService itemService;
+    private final UserService userService;
 
     @Override
     @Transactional
@@ -47,7 +48,7 @@ public class BookingServiceImpl implements BookingService {
         if (approved.equals("true")) {
             booking.setBookingStatus(BookingStatus.APPROVED);
             item.setAvailable(false);
-            itemRepository.save(item);
+            itemService.updateItem(item, userId);
         } else {
             booking.setBookingStatus(BookingStatus.REJECTED);
         }
@@ -95,12 +96,10 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private User getUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User ID= " + id + " не найден!"));
+        return userService.getUserById(id);
     }
 
     private Item getItemById(Long id) {
-        return itemRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Вещь ID= " + id + " не найдена!"));
+        return itemService.getItemById(id);
     }
 }

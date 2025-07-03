@@ -11,7 +11,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
@@ -25,14 +25,14 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final BookingRepository bookingRepository;
     private final ItemMapper itemMapper;
 
     @Override
     @Transactional
     public Item createItem(Item item, Long userId) {
-        User user = validateUserById(userId);
+        User user = getUserById(userId);
         item.setOwner(user);
         return itemRepository.save(item);
     }
@@ -92,7 +92,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public Comment addComment(Comment comment, Long userId, Long itemId) {
-        User author = validateUserById(userId);
+        User author = getUserById(userId);
         Item item = getItemById(itemId);
         if (!hasValidBooking(userId, itemId)) {
             throw new IllegalStateException("Пользователь не бронировал данную вещь");
@@ -110,8 +110,7 @@ public class ItemServiceImpl implements ItemService {
                 LocalDateTime.now());
     }
 
-    private User validateUserById(Long id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User ID= " + id + " не найден!"));
+    private User getUserById(Long id) {
+        return userService.getUserById(id);
     }
 }
