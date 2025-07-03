@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 @Data
 @Builder
@@ -22,5 +22,5 @@ public class ItemDto {
     @NotNull
     private Boolean available;
 
-    private User owner;
+    private UserDto owner;
 }

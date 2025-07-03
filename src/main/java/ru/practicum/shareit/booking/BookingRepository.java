@@ -23,7 +23,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findFutureBookingsByBookerId(@Param("bookerId") Long bookerId,
                                                @Param("now") LocalDateTime now);
 
-    List<Booking> findByBookerIdAndStatus(Long bookerId, Status status);
+    List<Booking> findByBookerIdAndBookingStatus(Long bookerId, BookingStatus bookingStatus);
 
     List<Booking> findByItemOwnerIdOrderByStartDesc(Long ownerId);
 
@@ -39,9 +39,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findFutureBookingsAllItemsByBookerId(@Param("ownerId") Long ownerId,
                                                        @Param("now") LocalDateTime now);
 
-    List<Booking> findByItemOwnerIdAndStatus(Long bookerId, Status status);
+    List<Booking> findByItemOwnerIdAndBookingStatus(Long bookerId, BookingStatus bookingStatus);
 
-    boolean existsByBookerIdAndItemIdAndStatusAndEndBefore(Long userId, Long itemId, Status status, LocalDateTime now);
+    boolean existsByBookerIdAndItemIdAndBookingStatusAndEndBefore(Long userId, Long itemId, BookingStatus bookingStatus, LocalDateTime now);
 
     List<Booking> findAllByItemOwnerIdOrderByStartDesc(Long bookerId);
 }

@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS booking (
     booking_end timestamp NOT NULL,
     booker_id BIGINT NOT NULL,
     item_id BIGINT NOT NULL,
-    status varchar,
+    booking_status varchar,
     FOREIGN KEY (booker_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
 );

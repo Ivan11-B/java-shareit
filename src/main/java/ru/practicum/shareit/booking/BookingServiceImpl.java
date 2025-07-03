@@ -25,14 +25,14 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public Booking createBooking(Booking booking, Long userId) {
-        User user = validateUserById(userId);
+        User user = getUserById(userId);
         booking.setBooker(user);
-        Item item = validateItemById(booking.getItem().getId());
+        Item item = getItemById(booking.getItem().getId());
         if (!item.getAvailable()) {
             throw new IllegalStateException("Вещь не доступна для бронирования");
         }
         booking.setItem(item);
-        booking.setStatus(Status.WAITING);
+        booking.setBookingStatus(BookingStatus.WAITING);
         return bookingRepository.save(booking);
     }
 
@@ -40,16 +40,16 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public Booking confirmBooking(Long bookingId, String approved, Long userId) {
         Booking booking = getBookingById(bookingId);
-        Item item = validateItemById(booking.getItem().getId());
+        Item item = getItemById(booking.getItem().getId());
         if (!userId.equals(item.getOwner().getId())) {
             throw new ItemOwnershipException("Пользователь не является владельцем данного товара");
         }
         if (approved.equals("true")) {
-            booking.setStatus(Status.APPROVED);
+            booking.setBookingStatus(BookingStatus.APPROVED);
             item.setAvailable(false);
             itemRepository.save(item);
         } else {
-            booking.setStatus(Status.REJECTED);
+            booking.setBookingStatus(BookingStatus.REJECTED);
         }
         return bookingRepository.save(booking);
     }
@@ -62,44 +62,44 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<Booking> getAllBookingToUser(Long userId, String state) {
-        validateUserById(userId);
+        getUserById(userId);
         if (state == null) {
             return bookingRepository.findByBookerIdOrderByStartDesc(userId);
         }
-        State status = State.valueOf(state);
+        BookingState status = BookingState.valueOf(state);
         return switch (status) {
             case CURRENT -> bookingRepository.findCurrentBookingsByBookerId(userId, LocalDateTime.now());
             case PAST -> bookingRepository.findPastBookingsByBookerId(userId, LocalDateTime.now());
             case FUTURE -> bookingRepository.findFutureBookingsByBookerId(userId, LocalDateTime.now());
-            case WAITING -> bookingRepository.findByBookerIdAndStatus(userId, Status.WAITING);
-            case REJECTED -> bookingRepository.findByBookerIdAndStatus(userId, Status.REJECTED);
+            case WAITING -> bookingRepository.findByBookerIdAndBookingStatus(userId, BookingStatus.WAITING);
+            case REJECTED -> bookingRepository.findByBookerIdAndBookingStatus(userId, BookingStatus.REJECTED);
             default -> bookingRepository.findByBookerIdOrderByStartDesc(userId);
         };
     }
 
     @Override
     public List<Booking> getBookingAllItemsToUser(Long userId, String state) {
-        validateUserById(userId);
+        getUserById(userId);
         if (state == null) {
             return bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
         }
-        State status = State.valueOf(state);
+        BookingState status = BookingState.valueOf(state);
         return switch (status) {
             case CURRENT -> bookingRepository.findCurrentBookingsAllItemsByBookerId(userId, LocalDateTime.now());
             case PAST -> bookingRepository.findPastBookingsAllItemsByBookerId(userId, LocalDateTime.now());
             case FUTURE -> bookingRepository.findFutureBookingsAllItemsByBookerId(userId, LocalDateTime.now());
-            case WAITING -> bookingRepository.findByItemOwnerIdAndStatus(userId, Status.WAITING);
-            case REJECTED -> bookingRepository.findByItemOwnerIdAndStatus(userId, Status.REJECTED);
+            case WAITING -> bookingRepository.findByItemOwnerIdAndBookingStatus(userId, BookingStatus.WAITING);
+            case REJECTED -> bookingRepository.findByItemOwnerIdAndBookingStatus(userId, BookingStatus.REJECTED);
             default -> bookingRepository.findByItemOwnerIdOrderByStartDesc(userId);
         };
     }
 
-    private User validateUserById(Long id) {
+    private User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User ID= " + id + " не найден!"));
     }
 
-    private Item validateItemById(Long id) {
+    private Item getItemById(Long id) {
         return itemRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Вещь ID= " + id + " не найдена!"));
     }

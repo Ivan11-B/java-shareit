@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.Status;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exception.ItemOwnershipException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
@@ -62,7 +62,7 @@ public class ItemServiceImpl implements ItemService {
         return items.stream().map(item -> {
             List<Booking> bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(item.getId());
             List<Comment> comments = commentRepository.findByItemId(item.getId());
-            return itemMapper.toDtoWithBooking(item, bookings, comments);
+            return itemMapper.toDto(item, bookings, comments);
         }).collect(Collectors.toList());
     }
 
@@ -77,7 +77,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = getItemById(id);
         List<Booking> bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(item.getId());
         List<Comment> comments = commentRepository.findByItemId(id);
-        return itemMapper.toDtoWithBooking(item, bookings, comments);
+        return itemMapper.toDto(item, bookings, comments);
     }
 
     @Override
@@ -103,10 +103,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     boolean hasValidBooking(Long userId, Long itemId) {
-        return bookingRepository.existsByBookerIdAndItemIdAndStatusAndEndBefore(
+        return bookingRepository.existsByBookerIdAndItemIdAndBookingStatusAndEndBefore(
                 userId,
                 itemId,
-                Status.APPROVED,
+                BookingStatus.APPROVED,
                 LocalDateTime.now());
     }
 

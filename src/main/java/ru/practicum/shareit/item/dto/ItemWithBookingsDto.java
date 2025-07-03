@@ -1,8 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.*;
-import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,8 +17,8 @@ public class ItemWithBookingsDto {
     private String name;
     private String description;
     private Boolean available;
-    private User owner;
+    private UserDto owner;
     private LocalDateTime lastBooking;
     private LocalDateTime nextBooking;
-    private List<Comment> comments;
+    private List<CommentDto> comments;
 }

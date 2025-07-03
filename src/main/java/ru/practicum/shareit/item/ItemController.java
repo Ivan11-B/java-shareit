@@ -59,7 +59,6 @@ public class ItemController {
     public ResponseEntity<ItemWithBookingsDto> getItemById(@PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id) {
         log.debug("Получение вещи по ID: {}", id);
         ItemWithBookingsDto itemDto = itemService.getItemByIdWithBooking(id);
-//        ItemDto itemDto = itemMapper.toDto(item);
         log.info("Вещь ID = " + itemDto.getId() + " получен");
         return ResponseEntity.ok(itemDto);
     }
