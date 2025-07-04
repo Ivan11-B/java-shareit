@@ -2,57 +2,82 @@ package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.exception.ItemOwnershipException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
+    private final CommentRepository commentRepository;
     private final UserService userService;
+    private final BookingRepository bookingRepository;
+    private final ItemMapper itemMapper;
 
     @Override
+    @Transactional
     public Item createItem(Item item, Long userId) {
-        User user = userService.getUserById(userId);
-        item.setUser(user);
-        return itemRepository.addItem(item);
+        User user = getUserById(userId);
+        item.setOwner(user);
+        return itemRepository.save(item);
     }
 
     @Override
+    @Transactional
     public Item updateItem(Item item, Long userId) {
         Item currentItem = getItemById(item.getId());
-        Item updatedItem = new Item(currentItem.getId(), currentItem.getName(), currentItem.getDescription(),
-                currentItem.getAvailable(), currentItem.getUser());
-        if (item.getName() != null) {
-            updatedItem.setName(item.getName());
+        if (!currentItem.getOwner().getId().equals(userId)) {
+            throw new ItemOwnershipException("Пользователь не является владельцем данного товара");
         }
-        if (item.getDescription() != null) {
-            updatedItem.setDescription(item.getDescription());
+        if (item.getName() != null && !item.getName().isBlank()) {
+            currentItem.setName(item.getName());
+        }
+        if (item.getDescription() != null && !item.getDescription().isBlank()) {
+            currentItem.setDescription(item.getDescription());
         }
         if (item.getAvailable() != null) {
-            updatedItem.setAvailable(item.getAvailable());
+            currentItem.setAvailable(item.getAvailable());
         }
-        User user = userService.getUserById(userId);
-        if (user != null) {
-            updatedItem.setUser(user);
-        }
-        return itemRepository.updateItem(updatedItem);
+        return currentItem;
     }
 
     @Override
-    public List<Item> findAll() {
-        return itemRepository.getAll();
+    public List<ItemWithBookingsDto> findAll(Long userId) {
+        List<Item> items = itemRepository.findAllByOwnerId(userId);
+        return items.stream().map(item -> {
+            List<Booking> bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(item.getId());
+            List<Comment> comments = commentRepository.findByItemId(item.getId());
+            return itemMapper.toDto(item, bookings, comments);
+        }).collect(Collectors.toList());
     }
 
     @Override
     public Item getItemById(Long id) {
-        return itemRepository.getItemById(id)
+        return itemRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Вещь ID= " + id + " не найдена!"));
+    }
+
+    @Override
+    public ItemWithBookingsDto getItemByIdWithBooking(Long id) {
+        Item item = getItemById(id);
+        List<Booking> bookings = bookingRepository.findAllByItemOwnerIdOrderByStartDesc(item.getId());
+        List<Comment> comments = commentRepository.findByItemId(id);
+        return itemMapper.toDto(item, bookings, comments);
     }
 
     @Override
@@ -60,12 +85,32 @@ public class ItemServiceImpl implements ItemService {
         if (text == null || text.isEmpty()) {
             return List.of();
         }
-        return itemRepository.getItemsToSearch(text);
+        return itemRepository.searchInNameOrDescription(text);
+
     }
 
     @Override
-    public void deleteItem(Long id) {
-        getItemById(id);
-        itemRepository.deleteItem(id);
+    @Transactional
+    public Comment addComment(Comment comment, Long userId, Long itemId) {
+        User author = getUserById(userId);
+        Item item = getItemById(itemId);
+        if (!hasValidBooking(userId, itemId)) {
+            throw new IllegalStateException("Пользователь не бронировал данную вещь");
+        }
+        comment.setAuthor(author);
+        comment.setItem(item);
+        return commentRepository.save(comment);
+    }
+
+    boolean hasValidBooking(Long userId, Long itemId) {
+        return bookingRepository.existsByBookerIdAndItemIdAndBookingStatusAndEndBefore(
+                userId,
+                itemId,
+                BookingStatus.APPROVED,
+                LocalDateTime.now());
+    }
+
+    private User getUserById(Long id) {
+        return userService.getUserById(id);
     }
 }

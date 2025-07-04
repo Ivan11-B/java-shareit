@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
 
 @Data
 @Builder
@@ -15,5 +15,5 @@ public class ItemDtoUpdate {
 
     private Boolean available;
 
-    private User user;
+    private UserDto owner;
 }
