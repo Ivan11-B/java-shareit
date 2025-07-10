@@ -102,6 +102,16 @@ public class ItemServiceImpl implements ItemService {
         return commentRepository.save(comment);
     }
 
+    @Override
+    public List<Item> getItemsByListRequest(List<Long> requests) {
+        return itemRepository.findAllByRequestIdIn(requests);
+    }
+
+    @Override
+    public List<Item> getItemsByRequest(Long request) {
+        return itemRepository.findAllByRequestId(request);
+    }
+
     boolean hasValidBooking(Long userId, Long itemId) {
         return bookingRepository.existsByBookerIdAndItemIdAndBookingStatusAndEndBefore(
                 userId,

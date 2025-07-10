@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS comments;
+DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS booking;
 DROP TABLE IF EXISTS items;
 DROP TABLE IF EXISTS users;
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS items (
     description VARCHAR(255) NOT NULL,
     is_available BOOLEAN,
     owner_id BIGINT NOT NULL,
+    request_id BiGINT,
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -38,3 +40,11 @@ CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS requests (
+    id BIGSERIAL PRIMARY KEY,
+    description VARCHAR(255) NOT NULL,
+    requestor_id BIGINT NOT NULL,
+    created timestamp NOT NULL,
+    FOREIGN KEY (requestor_id) REFERENCES users(id) ON DELETE CASCADE
+    );

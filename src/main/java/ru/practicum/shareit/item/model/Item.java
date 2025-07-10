@@ -34,4 +34,7 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id")
     private User owner;
+
+    @Column(name = "request_id")
+    private Long requestId;
 }
