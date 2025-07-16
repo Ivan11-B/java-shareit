@@ -11,7 +11,9 @@ import ru.practicum.shareit.booking.dto.BookItemRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.client.BaseClient;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class BookingClient extends BaseClient {
@@ -28,12 +30,17 @@ public class BookingClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getBookings(long userId, BookingState state, Integer from, Integer size) {
-        Map<String, Object> parameters = Map.of(
-                "state", state.name(),
-                "from", from,
-                "size", size
-        );
-        return get("?state={state}&from={from}&size={size}", userId, parameters);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("from", from);
+        parameters.put("size", size);
+
+        Optional.ofNullable(state)
+                .ifPresent(s -> parameters.put("state", s.name()));
+
+        String path = parameters.containsKey("state")
+                ? "?state={state}&from={from}&size={size}"
+                : "?from={from}&size={size}";
+        return get(path, userId, parameters);
     }
 
 

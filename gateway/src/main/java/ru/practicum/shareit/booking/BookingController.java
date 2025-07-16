@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -23,12 +24,10 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<Object> getBookings(@RequestHeader("X-Sharer-User-Id") long userId,
-                                              @RequestParam(name = "state", defaultValue = "all") String stateParam,
+                                              @RequestParam(name = "state", required = false) @Nullable BookingState state,
                                               @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                               @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
-        log.info("Получить бронирование state {}, userId={}, from={}, size={}", stateParam, userId, from, size);
+        log.info("Получить бронирование state {}, userId={}, from={}, size={}", state, userId, from, size);
         return bookingClient.getBookings(userId, state, from, size);
     }
 
@@ -56,12 +55,10 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public ResponseEntity<Object> getBookingToUserAllItems(@RequestParam(name = "state", defaultValue = "all") String stateParam,
+    public ResponseEntity<Object> getBookingToUserAllItems(@RequestParam(name = "state", required = false) @Nullable BookingState state,
                                                            @RequestHeader("X-Sharer-User-Id") Long userId) {
-        BookingState state = BookingState.from(stateParam)
-                .orElseThrow(() -> new IllegalArgumentException("Unknown state: " + stateParam));
         log.info("Получение списка бронирований для всех вещей текущего пользователя ID: {}, статус: {}",
-                userId, stateParam);
+                userId, state);
         return bookingClient.getBookingToUserAllItems(state, userId);
     }
 }
