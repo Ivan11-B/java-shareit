@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import ru.practicum.shareit.user.model.User;
@@ -24,7 +23,6 @@ public class Comment {
     private Long id;
 
     @Column
-    @NotBlank
     private String text;
 
     @ManyToOne

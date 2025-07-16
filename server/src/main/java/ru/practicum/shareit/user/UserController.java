@@ -1,7 +1,5 @@
 package ru.practicum.shareit.user;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@Valid @RequestBody UserDto userDto) {
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         log.debug("Создание пользователя: {}", userDto);
         User user = userMapper.toEntity(userDto);
         UserDto createdUser = userMapper.toDto(userService.create(user));
@@ -42,7 +40,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@RequestBody UserDtoUpdate userDtoUpdate,
-                                              @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id) {
+                                              @PathVariable Long id) {
         userDtoUpdate.setId(id);
         User user = userMapper.toEntity(userDtoUpdate);
         user.setId(id);
@@ -54,7 +52,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(
-            @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id) {
+            @PathVariable Long id) {
         log.debug("Получение пользователя по ID: {}", id);
         User user = userService.getUserById(id);
         UserDto userDto = userMapper.toDto(user);
@@ -64,7 +62,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(
-            @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id) {
+            @PathVariable Long id) {
         log.debug("Удаление пользователя ID: {}", id);
         userService.delete(id);
         log.info("Пользователь ID = " + id + " удален");

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.user.dto;
 
-import jakarta.validation.constraints.Email;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,6 +10,5 @@ public class UserDtoUpdate {
 
     private String name;
 
-    @Email(message = "Некорректный email")
     private String email;
 }

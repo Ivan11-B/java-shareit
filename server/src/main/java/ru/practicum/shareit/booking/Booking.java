@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode(of = "bookingId")
+@EqualsAndHashCode(of = "id")
 @Builder
 public class Booking {
 
@@ -23,11 +22,9 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @Column(name = "booking_start")
     private LocalDateTime start;
 
-    @NotNull
     @Column(name = "booking_end")
     private LocalDateTime end;
 

@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item;
 
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class ItemController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<ItemDto> updateItem(@RequestBody ItemDtoUpdate itemDtoUpdate,
-                                              @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id,
+                                              @PathVariable Long id,
                                               @RequestHeader("X-Sharer-User-Id") Long userId) {
         itemDtoUpdate.setId(id);
         Item item = itemMapper.toEntity(itemDtoUpdate);
@@ -55,7 +54,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemWithBookingsDto> getItemById(@PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long id) {
+    public ResponseEntity<ItemWithBookingsDto> getItemById(@PathVariable Long id) {
         log.debug("Получение вещи по ID: {}", id);
         ItemWithBookingsDto itemDto = itemService.getItemByIdWithBooking(id);
         log.info("Вещь ID = " + itemDto.getId() + " получен");
@@ -73,7 +72,7 @@ public class ItemController {
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDto> createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                     @RequestBody CommentDto commentDto,
-                                                    @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long itemId) {
+                                                    @PathVariable Long itemId) {
         log.debug("Создание комментария: {}, для вещи: {}, пользователем: {}", commentDto, itemId, userId);
         Comment comment = commentMapper.toEntity(commentDto);
         CommentDto createdComment = commentMapper.toDto(itemService.addComment(comment, userId, itemId));

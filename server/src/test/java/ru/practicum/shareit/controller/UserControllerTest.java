@@ -125,17 +125,6 @@ public class UserControllerTest {
     }
 
     @Test
-    void createUser_shouldReturnThrow() throws Exception {
-
-        UserDto userDto = UserDto.builder().name(name).email("email").build();
-
-        mvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(userDto))
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void getUserById_shouldReturnThrow() throws Exception {
 
         when(userService.getUserById(id))

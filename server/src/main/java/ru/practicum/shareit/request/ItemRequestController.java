@@ -1,6 +1,5 @@
 package ru.practicum.shareit.request;
 
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +47,7 @@ public class ItemRequestController {
 
     @GetMapping("/{requestId}")
     public ResponseEntity<ItemResponseDto> getItemRequestById(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                              @PathVariable @Min(value = 1, message = "ID должен быть ≥ 1") Long requestId) {
+                                                              @PathVariable Long requestId) {
         log.debug("Получение запроса по ID: {}", requestId);
         ItemResponseDto itemResponseDto = itemRequestService.getItemRequestById(userId, requestId);
         log.info("Запрос ID = " + itemResponseDto.getId() + " получен");
